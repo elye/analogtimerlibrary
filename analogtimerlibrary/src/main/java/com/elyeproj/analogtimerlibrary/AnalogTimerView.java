@@ -167,6 +167,7 @@ public class AnalogTimerView extends View {
 
     /**
      * Get the time. Needed for saveInstanceState.
+     * @return get the current counted time
      */
     public int getTime() {
         return timerCount;
@@ -174,6 +175,7 @@ public class AnalogTimerView extends View {
 
     /**
      * Get the time. Needed for restoreInstanceState.
+     * @param timerCount set the starting of timer click
      */
     public void setTime(int timerCount) {
         this.timerCount = timerCount;
@@ -182,6 +184,7 @@ public class AnalogTimerView extends View {
 
     /**
      * Get the time. Needed for saveInstanceState
+     * @return is the current timer counting
      */
     public boolean isRunning() {
         return timerCounter != null;
