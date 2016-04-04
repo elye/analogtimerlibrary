@@ -24,36 +24,37 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     tools:context="com.elyeproj.sampleanalogtimer.MainActivity">
 
     <com.elyeproj.analogtimerlibrary.AnalogTimerView
         android:id="@+id/myTimer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        />
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
         android:weightSum="3"
-        android:orientation="horizontal">
+        android:orientation="vertical">
         <Button
             android:id="@+id/start_button"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:text="@string/start_button"/>
         <Button
             android:id="@+id/stop_button"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:text="@string/stop_button"/>
         <Button
             android:id="@+id/reset_button"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:text="@string/reset_button"/>
     </LinearLayout>
 

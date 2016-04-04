@@ -12,8 +12,12 @@ import android.graphics.Path;
 import android.graphics.Path.Direction;
 import android.graphics.Shader;
 import android.os.Build.VERSION_CODES;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.View;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 /*
  * Copyright 2016 Elye Project
@@ -33,6 +37,9 @@ import android.view.View;
 
 public class AnalogTimerView extends View {
 
+    private static final int ONE_SECOND = 1000;
+    private static final int DEFAULT_MAX_TIME = 60;
+    private static final int ONE_CYCLE_DEGREE = 360;
     private Paint gradientPaint;
     private Paint handPaint;
     private Paint linePaint;
@@ -44,6 +51,10 @@ public class AnalogTimerView extends View {
     private Bitmap facadeBitmap;
     private float radius;
     private int movingDegree = 0;
+    private Timer timerCounter = null;
+    final Handler handler = new Handler();
+    private int timerCount = 0;
+    private int maxTime = DEFAULT_MAX_TIME;
 
     public AnalogTimerView(Context context) {
         super(context);
@@ -75,6 +86,62 @@ public class AnalogTimerView extends View {
         gradientPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
     }
 
+    public void startTimer() {
+        if (timerCounter == null) {
+            timerCounter = new Timer();
+            timerCounter.schedule(new TimerTask() {
+                @Override
+                public void run() {UpdateGUI();}
+            }, 0, ONE_SECOND);
+        }
+    }
+
+    public void stopTimer() {
+        if (timerCounter != null) {
+            timerCounter.cancel();
+            timerCounter = null;
+        }
+    }
+
+    public void resetTimer() {
+        setTime(0);
+    }
+
+    public int getTime() {
+        return timerCount;
+    }
+
+    public void setTime(int timerCount) {
+        this.timerCount = timerCount;
+        updateTimerUI();
+    }
+
+    public boolean isRunning() {
+        return timerCounter != null;
+    }
+
+    public void setMaxTime(int maxTime) {
+        this.maxTime = maxTime;
+    }
+
+    private void UpdateGUI() {
+        handler.post(myRunnable);
+        timerCount++;
+    }
+
+    final Runnable myRunnable = new Runnable() {
+        public void run() {
+            updateTimerUI();
+        }
+    };
+
+    private void updateTimerUI() {
+        if (timerCount >= maxTime) {
+            timerCount = 0;
+        }
+        setMovingDegree(timerCount * ONE_CYCLE_DEGREE/maxTime);
+    }
+
     public void setMovingDegree(int moving) {
         movingDegree = moving;
         invalidate();
@@ -83,14 +150,22 @@ public class AnalogTimerView extends View {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int minw = getPaddingLeft() + getPaddingRight() + getSuggestedMinimumWidth();
+        int minh = getPaddingTop() + getPaddingBottom() + getSuggestedMinimumHeight();
+
         int w = resolveSizeAndState(minw, widthMeasureSpec, 1);
-        int h = resolveSizeAndState(MeasureSpec.getSize(w), heightMeasureSpec, 0);
+        int h = resolveSizeAndState(minh, heightMeasureSpec, 1);
+
+        if (w == 0) w = h;
+        if (h == 0) h = w;
+
         setMeasuredDimension(w, h);
     }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
+
+        if (h == 0 || w == 0) return;
 
         // Account for padding
         float xpad = (float) (getPaddingLeft() + getPaddingRight());
@@ -164,11 +239,13 @@ public class AnalogTimerView extends View {
         int middleX = canvas.getWidth() / 2;
         int middleY = canvas.getHeight() / 2;
 
-        canvas.drawBitmap(facadeBitmap, 0, 0, null);
-        canvas.save();
-        canvas.rotate(movingDegree, middleX, middleY);
-        canvas.drawBitmap(handBitmap, 0, 0, null);
-        canvas.restore();
+        if (facadeBitmap != null && handBitmap != null) {
+            canvas.drawBitmap(facadeBitmap, 0, 0, null);
+            canvas.save();
+            canvas.rotate(movingDegree, middleX, middleY);
+            canvas.drawBitmap(handBitmap, 0, 0, null);
+            canvas.restore();
+        }
 
     }
 
@@ -177,5 +254,6 @@ public class AnalogTimerView extends View {
         path.lineTo(middleX, middleY - radius * 9 / 10 + length);
         canvas.drawPath(path, linePaint);
     }
+
 }
 
