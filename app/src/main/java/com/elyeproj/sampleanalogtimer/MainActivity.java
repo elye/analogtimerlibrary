@@ -21,10 +21,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.elyeproj.analogtimerlibrary.AnalogTimerView;
 
-public class MainActivity extends AppCompatActivity implements OnClickListener {
+public class MainActivity extends AppCompatActivity implements OnClickListener, AnalogTimerView.TimeOutListener {
 
     public static final String SAVE_STATE_CURRENT_TIME = "SaveStateCurrentTime";
     public static final String SAVE_STATE_IS_RUNNING = "SaveStateIsRunning";
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
 
     private void initView() {
         myTimer = (AnalogTimerView) findViewById(R.id.myTimer);
+        myTimer.setTimeOutListener(this);
         startButton = (Button) findViewById(R.id.start_button);
         stopButton = (Button) findViewById(R.id.stop_button);
         resetButton = (Button) findViewById(R.id.reset_button);
@@ -51,7 +53,6 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
         resetButton.setOnClickListener(this);
     }
 
-
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
@@ -60,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
             myTimer.startTimer();
         }
     }
-    
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -81,5 +82,10 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
             myTimer.resetTimer();
             break;
         }
+    }
+
+    @Override
+    public void onTimeOut() {
+        Toast.makeText(this, "Time Out!", Toast.LENGTH_SHORT).show();
     }
 }

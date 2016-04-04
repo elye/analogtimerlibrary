@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="analog_timer_view">
+        <attr name="max_time" format="integer" />
+        <attr name="period_second" format="float" />
+        <attr name="one_cycle_ticks" format="integer" />
+    </declare-styleable>
+</resources>

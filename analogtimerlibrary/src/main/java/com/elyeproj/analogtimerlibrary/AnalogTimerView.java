@@ -2,6 +2,7 @@ package com.elyeproj.analogtimerlibrary;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -37,9 +38,14 @@ import java.util.TimerTask;
 
 public class AnalogTimerView extends View {
 
+    public interface TimeOutListener {
+        void onTimeOut();
+    }
+
     private static final int ONE_SECOND = 1000;
     private static final int DEFAULT_MAX_TIME = 60;
     private static final int ONE_CYCLE_DEGREE = 360;
+    private static final int INVALID = -1;
     private Paint gradientPaint;
     private Paint handPaint;
     private Paint linePaint;
@@ -54,30 +60,65 @@ public class AnalogTimerView extends View {
     private Timer timerCounter = null;
     final Handler handler = new Handler();
     private int timerCount = 0;
-    private int maxTime = DEFAULT_MAX_TIME;
+    private int maxTime = INVALID;
+    private int periodMs = ONE_SECOND;
+    private int oneCycleTick = DEFAULT_MAX_TIME;
+    private TimeOutListener timeOutListener = null;
 
     public AnalogTimerView(Context context) {
         super(context);
-        init();
+        init(null);
     }
 
     public AnalogTimerView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init();
+        init(attrs);
     }
 
     public AnalogTimerView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
+        init(attrs);
     }
 
     @TargetApi(VERSION_CODES.LOLLIPOP)
     public AnalogTimerView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        init();
+        init(attrs);
     }
 
-    private void init() {
+    private void init(AttributeSet attrs) {
+        initAttrs(attrs);
+        initPaint();
+    }
+
+    private void initAttrs(AttributeSet attrs) {
+        if (attrs == null) return;
+        TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.analog_timer_view, 0, 0);
+        maxTime = typedArray.getInt(R.styleable.analog_timer_view_max_time, INVALID);
+        periodMs = (int)(typedArray.getFloat(R.styleable.analog_timer_view_period_second, 1.0f) * ONE_SECOND);
+        oneCycleTick = typedArray.getInt(R.styleable.analog_timer_view_one_cycle_ticks, DEFAULT_MAX_TIME);
+
+
+        validationOfParameter();
+    }
+
+    private void validationOfParameter() {
+        if (maxTime > oneCycleTick) {
+            throw new IllegalArgumentException("AnaologTimerView: max_time must be smaller or equal to oneCycleTick");
+        }
+        if (maxTime < INVALID || maxTime == 0) {
+            throw new IllegalArgumentException("AnaologTimerView: max_time must be larger than 0");
+        }
+        if (oneCycleTick <= 0) {
+            throw new IllegalArgumentException("AnaologTimerView: one_cycle_ticks must be larger " +
+                    "than 0");
+        }
+        if (periodMs < 100) {
+            throw new IllegalArgumentException("AnaologTimerView: period_ms must be larger than 0.1");
+        }
+    }
+
+    private void initPaint() {
         linePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         linePaint.setColor(Color.BLACK);
         linePaint.setStrokeWidth(3);
@@ -86,16 +127,22 @@ public class AnalogTimerView extends View {
         gradientPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
     }
 
+    /**
+     * Starting the Timer
+     */
     public void startTimer() {
         if (timerCounter == null) {
             timerCounter = new Timer();
             timerCounter.schedule(new TimerTask() {
                 @Override
                 public void run() {UpdateGUI();}
-            }, 0, ONE_SECOND);
+            }, 0, periodMs);
         }
     }
 
+    /**
+     * Stopping the Timer
+     */
     public void stopTimer() {
         if (timerCounter != null) {
             timerCounter.cancel();
@@ -103,46 +150,70 @@ public class AnalogTimerView extends View {
         }
     }
 
+    /**
+     * Reset the Timer
+     */
     public void resetTimer() {
         setTime(0);
     }
 
+    /**
+     * Setting the callback
+     * @param timeOutListener callback
+     */
+    public void setTimeOutListener(TimeOutListener timeOutListener) {
+        this.timeOutListener = timeOutListener;
+    }
+
+    /**
+     * Get the time. Needed for saveInstanceState.
+     */
     public int getTime() {
         return timerCount;
     }
 
+    /**
+     * Get the time. Needed for restoreInstanceState.
+     */
     public void setTime(int timerCount) {
         this.timerCount = timerCount;
         updateTimerUI();
     }
 
+    /**
+     * Get the time. Needed for saveInstanceState
+     */
     public boolean isRunning() {
         return timerCounter != null;
     }
 
-    public void setMaxTime(int maxTime) {
-        this.maxTime = maxTime;
-    }
-
     private void UpdateGUI() {
         handler.post(myRunnable);
-        timerCount++;
     }
 
     final Runnable myRunnable = new Runnable() {
         public void run() {
-            updateTimerUI();
+            if (maxTime != INVALID && timerCount >= maxTime) {
+                if (timeOutListener != null) {
+                    timeOutListener.onTimeOut();
+                }
+                stopTimer();
+                resetTimer();
+            } else {
+                updateTimerUI();
+                timerCount++;
+            }
         }
     };
 
     private void updateTimerUI() {
-        if (timerCount >= maxTime) {
+        if (timerCount >= oneCycleTick) {
             timerCount = 0;
         }
-        setMovingDegree(timerCount * ONE_CYCLE_DEGREE/maxTime);
+        setMovingDegree(timerCount * ONE_CYCLE_DEGREE/oneCycleTick);
     }
 
-    public void setMovingDegree(int moving) {
+    private void setMovingDegree(int moving) {
         movingDegree = moving;
         invalidate();
     }
