@@ -158,7 +158,7 @@ public class AnalogTimerView extends View {
     }
 
     /**
-     * Setting the callback
+     * Set the time out callback
      * @param timeOutListener callback
      */
     public void setTimeOutListener(TimeOutListener timeOutListener) {
@@ -166,7 +166,7 @@ public class AnalogTimerView extends View {
     }
 
     /**
-     * Get the time. Needed for saveInstanceState.
+     * Get the current ticking time. Needed for saveInstanceState.
      * @return get the current counted time
      */
     public int getTime() {
@@ -174,7 +174,7 @@ public class AnalogTimerView extends View {
     }
 
     /**
-     * Get the time. Needed for restoreInstanceState.
+     * Set the current ticking time. Needed for restoreInstanceState.
      * @param timerCount set the starting of timer click
      */
     public void setTime(int timerCount) {
@@ -183,7 +183,7 @@ public class AnalogTimerView extends View {
     }
 
     /**
-     * Get the time. Needed for saveInstanceState
+     * Check if it is current running. Needed for saveInstanceState
      * @return is the current timer counting
      */
     public boolean isRunning() {
