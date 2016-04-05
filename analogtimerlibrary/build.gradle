@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.dcendents.android-maven'
 
-group = 'com.elyeproj.analogtimerlibrary'
+group = 'com.elyeproj.libraries'
 version = '1.0.0'
 
 android {
@@ -45,6 +45,27 @@ task generateJavadocsJar(type: Jar) {
 }
 
 generateJavadocsJar.dependsOn generateJavadocs
+
+bintray {
+    user = 'YOUR_USERNAME'
+    key = 'YOUR_API_KEY'
+    pkg {
+        repo = 'maven'
+        name = 'com.elyeproj.analogtimerlibrary'
+
+        version {
+            name = '1.0.0-AnalogTimer'
+            desc = 'Analog Timer Widget'
+            released  = new Date()
+            vcsTag = '1.0.0'
+        }
+
+        licenses = ['Apache-2.0']
+        vcsUrl = 'https://github.com/elye/analogtimerlibrary.git'
+        websiteUrl = 'https://github.com/elye/analogtimerlibrary'
+    }
+    configurations = ['archives']
+}
 
 artifacts {
     archives generateJavadocsJar
