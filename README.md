@@ -53,6 +53,11 @@ To do this, you could set the TimeOutListener e.g
     });
     ```
 
+8. For the case of restoring the current state (in the event of Configuration (Orientation) Change or Don't Keep Activity), the library provides 2 APIs below for it.
+   1. `int getTime()` - Get the current ticking time. Useful for saveInstanceState.
+   2. `void setTime(int time)` - Set the starting ticking time. Useful when restoreInstanceState.
+   3. `boolean isRunning()` - Check if it is current running. Use when saveInstanceState, so that when restore instance state, we could decide to start timer automatically or not.
+
 ## Requirement
 Android SDK API Version 16 and above.
 
