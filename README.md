@@ -15,16 +15,24 @@ A Timer, that has a single hand and tick as below
     ```
 
 2. Instantiate the `AnalogTimerView` in your Activity/Fragment.
-    `AnalogTimerView analogTimerView = (AnalogTimerView)findViewById(R.id.myTimer);`
+    ```
+    AnalogTimerView analogTimerView = (AnalogTimerView)findViewById(R.id.myTimer);
+    ```
 
 3. Start the Timer by
-    `analogTimerView.startTimer();`
+    ```
+    analogTimerView.startTimer();
+    ```
 
 4. Stop the Timer by 
-    `analogTimerView.stopTimer();`
+    ```
+    analogTimerView.stopTimer();
+    ```
 
 5. Reset the Timer by 
-    `analogTimerView.resetTimer();
+    ```
+    analogTimerView.resetTimer();
+    ```
 
 6. You could also set the additional attribute through xml. The below example of what could be set 
     ```xml
@@ -53,23 +61,16 @@ To do this, you could set the TimeOutListener e.g
     });
     ```
 
-8. For the case of restoring the current state (in the event of Configuration (Orientation) Change or Don't Keep Activity), the library provides 2 APIs below for it.
+8. For the case of restoring the current state (in the event of Configuration (Orientation) Change or Don't Keep Activity), the library provides 3 APIs below for it.
    1. `int getTime()` - Get the current ticking time. Useful for saveInstanceState.
    2. `void setTime(int time)` - Set the starting ticking time. Useful when restoreInstanceState.
    3. `boolean isRunning()` - Check if it is current running. Use when saveInstanceState, so that when restore instance state, we could decide to start timer automatically or not.
+
 
 ## Requirement
 Android SDK API Version 16 and above.
 
 ## Importing the Library
-On your project `build.gradle`, add
-
-    repositories {
-        maven {
-            url 'https://dl.bintray.com/elye-project/maven'
-        }
-    }
-
 On your module `build.gradle`, add
 
     dependencies {
